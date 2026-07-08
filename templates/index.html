@@ -9,6 +9,7 @@
     <form method="POST">
         <label for="ticker">Ticker 입력:</label> 
         <p> ei.,NVDA, MU, AAPL, MSFT etc<p>
+        <p> ei. 삼성전자 → 005930.KS  SK하이닉스 → 000660.KS  etc <p> 
         <input type="text" id="ticker" name="ticker" required>
         <button type="submit">예측 실행</button> 
     </form>
@@ -16,7 +17,7 @@
     {% if result %}
         <h3>결과: {{ ticker }}</h3>
         <!-- 저장된 파일 대신 base64 인코딩된 이미지 표시 -->
-        <img src="data:image/png;base64,{{ plot_url }}" alt="예측 그래프" width="1200">
+        <img src="data:image/png;base64,{{ plot_url }}" alt="예측 그래프" width="1100">
     {% endif %}
 </body>
 </html>
