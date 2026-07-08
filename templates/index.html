@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Stock Prediction</title>
+</head>
+<body>
+    <h2>📈 주가 예측 시스템</h2>
+    <form method="POST">
+        <label for="ticker">Ticker 입력:</label> 
+        <p> ei.,NVDA, MU, AAPL, MSFT etc<p>
+        <input type="text" id="ticker" name="ticker" required>
+        <button type="submit">예측 실행</button> 
+    </form>
+
+    {% if result %}
+        <h3>결과: {{ ticker }}</h3>
+        <!-- 저장된 파일 대신 base64 인코딩된 이미지 표시 -->
+        <img src="data:image/png;base64,{{ plot_url }}" alt="예측 그래프" width="1200">
+    {% endif %}
+</body>
+</html>
+

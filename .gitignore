@@ -1,0 +1,16 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Python 정적 타입 검사기 mypy 캐시 파일
+.mypy_cache
+
+# Kiwoom REST API 모의투자 Key 정보 파일
+.env
