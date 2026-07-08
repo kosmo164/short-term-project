@@ -3,22 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <title>Stock Prediction</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #f0f0f0;
+            text-align: center;
+            padding: 40px;
+        }
+        h2 {
+            font-size: 2.5em;
+            color: #00e0ff;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+        }
+        p {
+            font-size: 1.1em;
+            color: #dcdcdc;
+            margin: 8px 0;
+        }
+        form {
+            background: rgba(255,255,255,0.05);
+            padding: 25px;
+            border-radius: 12px;
+            display: inline-block;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+        }
+        label {
+            font-size: 1.2em;
+            color: #ffffff;
+            display: block;
+            margin-bottom: 10px;
+        }
+        input[type="text"] {
+            padding: 12px;
+            width: 300px;
+            border-radius: 8px;
+            border: none;
+            outline: none;
+            font-size: 1em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        button {
+            background: #00e0ff;
+            color: #0f2027;
+            font-size: 1.1em;
+            font-weight: bold;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #00bcd4;
+            transform: scale(1.05);
+        }
+        h3 {
+            margin-top: 30px;
+            font-size: 1.8em;
+            color: #ffeb3b;
+        }
+        img {
+            margin-top: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+        }
+    </style>
 </head>
 <body>
-    <h2>📈 주가 예측 시스템</h2>
+    <h2>📈 주가앤코인 예측 시스템</h2>
+    <p>RNN-Deeplearning by Sequential Model</p>
     <form method="POST">
         <label for="ticker">Ticker 입력:</label> 
-        <p> ei.,NVDA, MU, AAPL, MSFT etc<p>
-        <p> ei. 삼성전자 → 005930.KS  SK하이닉스 → 000660.KS  etc <p> 
+        <p>예: NVDA, MU, AAPL, MSFT, GOOGL, AMZN, TSLA, LLY, WMT, CSCO 등</p>
+        <p>예: 비트코인 → BTC-USD, 이더리움 → ETH-USD, 리플 → XRP-USD, 도지코인 → DOGE-USD 등</p> 
+        <p>예: 삼성전자 → 005930.KS, SK하이닉스 → 000660.KS 등</p> 
         <input type="text" id="ticker" name="ticker" required>
         <button type="submit">예측 실행</button> 
     </form>
 
     {% if result %}
         <h3>결과: {{ ticker }}</h3>
-        <!-- 저장된 파일 대신 base64 인코딩된 이미지 표시 -->
-        <img src="data:image/png;base64,{{ plot_url }}" alt="예측 그래프" width="1100">
+        <img src="data:image/png;base64,{{ plot_url }}" alt="예측 그래프" width="1000">
     {% endif %}
 </body>
 </html>
-
