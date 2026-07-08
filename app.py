@@ -3,6 +3,7 @@ from model import run_prediction
 
 app = Flask(__name__)
 
+# comment
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
