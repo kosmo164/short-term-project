@@ -10,12 +10,16 @@ from io import BytesIO
 import base64
 
 def run_prediction(TICKER):
-    PAST_DAYS = 12
+    # -----------------------------
+    # 🔧 주요 설정값
+    # -----------------------------   
+    PAST_DAYS = 10
     TRAIN_RATIO = 0.8
-    FUTURE_DAYS = 90
-    START_DATE = "2025-07-01"
+    FUTURE_DAYS = 30
+    START_DATE = "2024-07-01"
     END_DATE = datetime.today().strftime("%Y-%m-%d")
-
+    
+    # 📊 데이터 다운로드
     data = yf.download(TICKER, start=START_DATE, end=END_DATE, progress=False)
     if data.empty:
         raise ValueError(f"{TICKER} 데이터 수집 실패")
@@ -24,19 +28,23 @@ def run_prediction(TICKER):
     dates = pd.to_datetime(df.index)
     prices = df["Close"].values.reshape(-1, 1)
 
+    # ⚖️ 정규화
     scaler = MinMaxScaler()
     scaled = scaler.fit_transform(prices)
 
+    # 🏗️ 입력/출력 데이터 생성
     X, Y = [], []
     for i in range(len(scaled) - PAST_DAYS):
         X.append(scaled[i:i + PAST_DAYS])
         Y.append(scaled[i + PAST_DAYS])
     X, Y = np.array(X), np.array(Y)
 
+    # 🔀 학습/테스트 분리
     split = int(len(X) * TRAIN_RATIO)
     X_train, X_test = X[:split], X[split:]
     Y_train, Y_test = Y[:split], Y[split:]
 
+    # 🤖 LSTM 모델
     model = Sequential([
         InputLayer(shape=(PAST_DAYS, 1)),
         LSTM(64),
@@ -45,10 +53,12 @@ def run_prediction(TICKER):
     model.compile(optimizer="adam", loss="mse")
     model.fit(X_train, Y_train, epochs=10, batch_size=16, verbose=0)
 
+    # 📈 테스트 데이터 예측
     pred_test = model.predict(X_test, verbose=0)
     pred_test = scaler.inverse_transform(pred_test).flatten()
     test_dates = dates[PAST_DAYS + split:PAST_DAYS + split + len(pred_test)]
 
+    # 🔮 미래 예측 (RNN만 사용)
     seq = scaled[-PAST_DAYS:].reshape(1, PAST_DAYS, 1)
     future_vals = []
     for _ in range(FUTURE_DAYS):
@@ -58,21 +68,32 @@ def run_prediction(TICKER):
     future_pred = scaler.inverse_transform(np.array(future_vals).reshape(-1, 1)).flatten()
     future_dates = pd.bdate_range(start=dates[-1] + pd.Timedelta(days=1), periods=FUTURE_DAYS)
 
-    # 그래프를 메모리에 저장
+    # 📊 볼린저 밴드 계산 (과거~현재만)
+    df["MA20"] = df["Close"].rolling(window=20).mean()
+    df["STD20"] = df["Close"].rolling(window=20).std()
+    df["Upper"] = df["MA20"] + (df["STD20"] * 2)
+    df["Lower"] = df["MA20"] - (df["STD20"] * 2)
+
+    # 🎨 그래프
     fig, ax = plt.subplots(figsize=(15, 7))
     ax.plot(dates, prices.flatten(), color="gray", linewidth=2.5, alpha=0.9, label="Past Actual")
     ax.plot(test_dates, pred_test, color="royalblue", linewidth=2.2, label="Past Predicted")
     ax.plot(future_dates, future_pred, color="crimson", linewidth=2.8, label="Future Predicted")
     ax.axvline(dates[-1], color="black", linestyle="--", linewidth=1.3, alpha=0.8, label="Last Actual Date")
     ax.scatter([dates[-1]], [prices[-1][0]], color="black", s=60, zorder=7, label="Current Price")
-    ax.set_title(f"{TICKER} Stock Price Forecast", fontsize=14)
+
+    # 볼린저 밴드 표시
+    ax.plot(df.index, df["MA20"], color="orange", linewidth=1.5, label="MA20")
+    ax.plot(df.index, df["Upper"], color="green", linestyle="--", linewidth=1.2, label="Upper Band")
+    ax.plot(df.index, df["Lower"], color="red", linestyle="--", linewidth=1.2, label="Lower Band")
+
+    ax.set_title(f"{TICKER} Stock Price Forecast with Bollinger Bands", fontsize=14)
     ax.set_xlabel("Date")
     ax.set_ylabel("Price")
     ax.legend()
     ax.grid(True, linestyle=":", alpha=0.35)
     plt.tight_layout()
 
-    # BytesIO로 변환 후 base64 인코딩
     img = BytesIO()
     plt.savefig(img, format="png")
     img.seek(0)
@@ -80,5 +101,3 @@ def run_prediction(TICKER):
     plt.close()
 
     return plot_url
-
-
